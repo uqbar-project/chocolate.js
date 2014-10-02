@@ -82,19 +82,28 @@
 				return {x: 200, y: 0, width: 10, height: 180};
 			}
 		}],
-		update: function(t) {
+		updateTime: function(t) {
 			this.objects.forEach(function(o){
 				o.update(t);
 			});
+		}, 
+		updateCollisions: function() {
+			var collisions = []
 			this.objects.forEach(function(o){
 				this.objects.forEach(function(o2) {
 					if(o !== o2 && collides(o.bound, o2.bound)) {
-						o.collide();
-						o2.collide();
+						collisions.push({ from: o, to: o2 });
 					}
 				})
-			}, this)
-		}, 
+			}, this);
+			collisions.forEach(function(c){
+				c.from.collide(c.to);
+			})
+		},
+		update: function(t) {
+			this.updateTime(t);
+			this.updateCollisions();
+		},
 		render: function() {
 			this.canvas.clear();
 			this.objects.forEach(function(o){
@@ -124,7 +133,7 @@
 	runGame(1, canvas1);
 	runGame(0.5, canvas2);
 	runGame(0.1, canvas3);
-
+	//entity: actor(id + state + behaviour) + bounding + visual rendering 
 	</script>
 </body>
 </html>
