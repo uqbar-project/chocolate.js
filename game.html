@@ -4,12 +4,6 @@
 	<div>
 		<canvas id="canvas" width="800" height="100"></canvas>
 	</div>
-	<div>
-		<canvas id="canvas2" width="800" height="100"></canvas>
-	</div>
-	<div>
-		<canvas id="canvas3" width="800" height="100"></canvas>
-	</div>
 	<script>
 
 	function Canvas(id) {
@@ -177,12 +171,7 @@
 	}
 
 	var canvas1 = new Canvas('canvas');
-	var canvas2 = new Canvas('canvas2');
-	var canvas3 = new Canvas('canvas3');
-
 	runGame(0.1, canvas1);
-	runGame(0.5, canvas2);
-	runGame(1, canvas3);
 	//entity: actor(id + state + behaviour) + bounding + visual rendering 
 	</script>
 </body>
