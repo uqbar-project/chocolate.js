@@ -7,29 +7,8 @@
 	<script src="axe.js"></script>
 	<script src="point.js"></script>
 	<script src="rectangle.js"></script>
+	<script src="canvas.js"></script>
 	<script>
-	function Canvas(id) {
-		this.innerCanvas = document.getElementById(id);
-		this.context = this.innerCanvas.getContext('2d');
-	}
-	Canvas.prototype = {
-		onMouseDown: function(callback) {
-			this.innerCanvas.addEventListener('mousedown', callback, false);
-		},
-		drawRectangle: function(myRectangle, color) {
-			this.context.beginPath();
-			this.context.rect(myRectangle.x, myRectangle.y, myRectangle.width, myRectangle.height);
-			this.context.fillStyle =  color || '#8ED6FF';
-			this.context.fill();
-			this.context.lineWidth = myRectangle.borderWidth;
-			this.context.strokeStyle = 'black';
-			this.context.stroke();
-		}, 
-		clear: function(){
-			this.context.clearRect(0, 0, this.innerCanvas.width, this.innerCanvas.height)
-		}
-	}
-
 	function schedule(loop, period) {
 		loop(0);
 		setInterval(function(){
@@ -50,46 +29,50 @@
 		mailbox.forEach(function(it){ it() });
 	}
 
-	var Game = {
-		objects: [{
-			x: 0, 
-			color: '#8ED6FF',
-			mailbox: [],
-			states: {
-				Moving: { 
-					update: function(t) {
-						this.x += 30 * t;
-					}
-				}, 
-				Stopped: {
-					update: function(t) {}
+	var Square = {
+		x: 0, 
+		color: '#8ED6FF',
+		mailbox: [],
+		states: {
+			Moving: { 
+				update: function(t) {
+					this.x += 30 * t;
 				}
-			},
-			update: function(t) {
-				this.state = this.state || this.states.Moving;
-				this.state.update.call(this, t); 
-			},
-			mouseDown: function() {
-				this.color = '#0ED600';
-			},
-			collide: function()	{
-				this.state = this.states.Stopped;
-			},
-			render: function(canvas) {
-				canvas.drawRectangle(this.bound, this.color);
-			},
-			get bound() {
-				return new Rectangle(this.x, 0, 100, 100)
+			}, 
+			Stopped: {
+				update: function(t) {}
 			}
-		}, { 
-			mailbox: [],
-			render: function(canvas) {
-				canvas.drawRectangle(this.bound);
-			},
-			get bound() {
-				return new Rectangle(400, 0, 10, 180)
-			}
-		}],
+		},
+		update: function(t) {
+			this.state = this.state || this.states.Moving;
+			this.state.update.call(this, t); 
+		},
+		mouseDown: function() {
+			this.color = '#0ED600';
+		},
+		collide: function()	{
+			this.state = this.states.Stopped;
+		},
+		render: function(canvas) {
+			canvas.drawRectangle(this.bound, this.color);
+		},
+		get bound() {
+			return new Rectangle(this.x, 0, 100, 100)
+		}
+	};
+
+	var Wall = { 
+		mailbox: [],
+		render: function(canvas) {
+			canvas.drawRectangle(this.bound);
+		},
+		get bound() {
+			return new Rectangle(400, 0, 10, 180)
+		}
+	};
+
+	var Game = {
+		objects: [Square, Wall],
 		eventQueue: [],
 		updateTime: function(t) {
 			this.objects.forEach(function(o) {
