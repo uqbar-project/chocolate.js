@@ -17,10 +17,13 @@
 		this.context = this.innerCanvas.getContext('2d');
 	}
 	Canvas.prototype = {
-		drawRectangle: function(myRectangle) {
+		onMouseDown: function(callback) {
+			this.innerCanvas.addEventListener('mousedown', callback, false);
+		},
+		drawRectangle: function(myRectangle, color) {
 			this.context.beginPath();
 			this.context.rect(myRectangle.x, myRectangle.y, myRectangle.width, myRectangle.height);
-			this.context.fillStyle = '#8ED6FF';
+			this.context.fillStyle =  color || '#8ED6FF';
 			this.context.fill();
 			this.context.lineWidth = myRectangle.borderWidth;
 			this.context.strokeStyle = 'black';
@@ -32,11 +35,18 @@
 	}
 
 	function collides(bound1, bound2) {
-		function collideAxe(axe, dimmension) {
-			return (axe(bound2) >= axe(bound1) && axe(bound2) <= axe(bound1) + dimmension(bound1))
+		return within(bound1, bound2) || 
+		within({x: bound1.x + bound1.width, y: bound1.y}, bound2) || 
+		within({x: bound1.x, y: bound1.y + bound1.height}, bound2)  ||
+		within({x: bound1.x + bound1.width, y: bound1.y + bound1.height}, bound2)
+	}
+
+	function within(point, bound) {
+		function withinAxe(axe, dimmension) {
+			return (axe(point) >= axe(bound) && axe(point) <= axe(bound) + dimmension(bound))
 		}
-		return collideAxe(function(it){return it.x}, function(it) { return it.width }) && 
-		collideAxe(function(it){return it.y}, function(it) { return it.height });
+		return withinAxe(function(it){return it.x}, function(it) { return it.width }) && 
+		withinAxe(function(it){return it.y}, function(it) { return it.height });
 	}
 
 	function schedule(loop, period) {
@@ -46,13 +56,28 @@
 		}, period * 1000);
 	}
 
+	function tell(entity, action, args) {
+		entity.mailbox.push(function(){
+			var handler = entity[action];
+			handler && handler.call(entity, args);
+		});
+	}
+
+	function run(entity) {
+		var mailbox = entity.mailbox;
+		entity.mailbox = [];
+		mailbox.forEach(function(it){ it() });
+	}
+
 	var Game = {
 		objects: [{
 			x: 0, 
+			color: '#8ED6FF',
+			mailbox: [],
 			states: {
 				Moving: { 
 					update: function(t) {
-						this.x += 10 * t;
+						this.x += 30 * t;
 					}
 				}, 
 				Stopped: {
@@ -63,46 +88,61 @@
 				this.state = this.state || this.states.Moving;
 				this.state.update.call(this, t); 
 			},
+			mouseDown: function() {
+				this.color = '#0ED600';
+			},
 			collide: function()	{
 				this.state = this.states.Stopped;
 			},
 			render: function(canvas) {
-				canvas.drawRectangle(this.bound);
+				canvas.drawRectangle(this.bound, this.color);
 			},
 			get bound() {
 				return {x: this.x, y: 0, width: 100, height: 100};
 			}
 		}, { 
-			update: function(t) {},
-			collide: function() {},
+			mailbox: [],
 			render: function(canvas) {
 				canvas.drawRectangle(this.bound);
 			},
 			get bound() {
-				return {x: 200, y: 0, width: 10, height: 180};
+				return {x: 400, y: 0, width: 10, height: 180};
 			}
 		}],
+		eventQueue: [],
 		updateTime: function(t) {
-			this.objects.forEach(function(o){
-				o.update(t);
+			this.objects.forEach(function(o) {
+				//o.update(t);
+				tell(o, 'update', t);
 			});
 		}, 
 		updateCollisions: function() {
-			var collisions = []
 			this.objects.forEach(function(o){
 				this.objects.forEach(function(o2) {
 					if(o !== o2 && collides(o.bound, o2.bound)) {
-						collisions.push({ from: o, to: o2 });
+						tell(o, 'collide', o2);
 					}
 				})
 			}, this);
-			collisions.forEach(function(c){
-				c.from.collide(c.to);
-			})
 		},
+		updateEvents: function() {
+			this.eventQueue.forEach(function(e){
+				this.objects.forEach(function(o) {
+					e(o);
+				})
+			}, this)
+			this.eventQueue = [];
+		},
+
 		update: function(t) {
-			this.updateTime(t);
+			this.updateEvents();
 			this.updateCollisions();
+			this.updateTime(t);
+
+
+			this.objects.forEach(function(o){ 
+				run(o);
+			})
 		},
 		render: function() {
 			this.canvas.clear();
@@ -123,6 +163,16 @@
 		var game = Object.create(Game);
 		game.period = period;
 		game.canvas = canvas;
+		game.canvas.onMouseDown(function(e) {
+			game.eventQueue.push(function(entity) {
+				//console.log('E' + entity.bound.x +":"+ entity.bound.y +":"+ entity.bound.width +":"+ entity.bound.height )
+				//console.log('P' + e.pageX +":"+ e.pageY)
+				if(within({x: e.pageX, y: e.pageY}, entity.bound)) {
+					//console.log('within')
+					tell(entity, 'mouseDown', e.pageX, e.pageY);
+				}
+			})
+		})
 		game.run();
 	}
 
@@ -130,9 +180,9 @@
 	var canvas2 = new Canvas('canvas2');
 	var canvas3 = new Canvas('canvas3');
 
-	runGame(1, canvas1);
+	runGame(0.1, canvas1);
 	runGame(0.5, canvas2);
-	runGame(0.1, canvas3);
+	runGame(1, canvas3);
 	//entity: actor(id + state + behaviour) + bounding + visual rendering 
 	</script>
 </body>
