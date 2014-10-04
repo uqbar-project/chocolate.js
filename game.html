@@ -71,8 +71,21 @@
 		}
 	};
 
-	var Game = {
-		objects: [Square, Wall],
+	function Game(period, canvas, objects) {
+		this.period = period;
+		this.canvas = canvas;
+		this.objects = objects;
+		this.canvas.onMouseDown(function(e) {
+			game.eventQueue.push(function(entity) {
+				var point = new Point(e.pageX, e.pageY) 
+				if(point.within(entity.bound)) {
+					tell(entity, 'mouseDown', point);
+				}
+			})
+		}.bind(this))
+	}
+
+	Game.prototype = {
 		eventQueue: [],
 		updateTime: function(t) {
 			this.objects.forEach(function(o) {
@@ -122,23 +135,10 @@
 		}
 	}
 
-	function runGame(period, canvas) {
-		var game = Object.create(Game);
-		game.period = period;
-		game.canvas = canvas;
-		game.canvas.onMouseDown(function(e) {
-			game.eventQueue.push(function(entity) {
-				var point = new Point(e.pageX, e.pageY) 
-				if(point.within(entity.bound)) {
-					tell(entity, 'mouseDown', point);
-				}
-			})
-		})
-		game.run();
-	}
 
 	var canvas1 = new Canvas('canvas');
-	runGame(0.1, canvas1);
+	var game = new Game(0.1, canvas1, [Square, Wall]);
+	game.run();
 	//entity: actor(id + state + behaviour) + bounding + visual rendering 
 	</script>
 </body>
