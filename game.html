@@ -31,12 +31,12 @@
 
 	var Square = {
 		x: 0, 
-		color: '#8ED6FF',
+		selected: false,
 		mailbox: [],
 		states: {
 			Moving: { 
 				update: function(t) {
-					this.x += 30 * t;
+					this.x += 50 * t;
 				}
 			}, 
 			Stopped: {
@@ -48,13 +48,13 @@
 			this.state.update.call(this, t); 
 		},
 		mouseDown: function() {
-			this.color = '#0ED600';
+			this.selected = !this.selected;
 		},
 		collide: function()	{
 			this.state = this.states.Stopped;
 		},
 		render: function(canvas) {
-			canvas.drawRectangle(this.bound, this.color);
+			canvas.drawRectangle(this.bound, this.selected ? '#0ED600' : '#8ED6FF');
 		},
 		get bound() {
 			return new Rectangle(this.x, 0, 100, 100)
@@ -63,8 +63,12 @@
 
 	var Wall = { 
 		mailbox: [],
+		hitted: false, 
 		render: function(canvas) {
-			canvas.drawRectangle(this.bound);
+			canvas.drawRectangle(this.bound, this.hitted ? '#FF2020' : null);
+		},
+		collide: function() {
+			this.hitted = true;
 		},
 		get bound() {
 			return new Rectangle(400, 0, 10, 180)
