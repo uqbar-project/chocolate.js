@@ -4,7 +4,10 @@ function Canvas(id) {
 }
 Canvas.prototype = {
 	onMouseDown: function(callback) {
-		this.innerCanvas.addEventListener('mousedown', callback, false);
+		this.innerCanvas.addEventListener('mousedown', callback, false)
+	},
+	onKeyPress: function(callback) {
+		this.innerCanvas.addEventListener('keydown', callback, false)
 	},
 	drawRectangle: function(myRectangle, color) {
 		this.context.beginPath();

@@ -2,7 +2,7 @@
 <head></head>
 <body>
 	<div>
-		<canvas id="canvas" width="800" height="100"></canvas>
+		<canvas id="canvas" tabindex="1" width="800" height="100"></canvas>
 	</div>
 	<script src="axe.js"></script>
 	<script src="point.js"></script>
@@ -50,6 +50,9 @@
 		mouseDown: function() {
 			this.selected = !this.selected;
 		},
+		keyPress: function(keyCode){
+			if(this.selected && keyCode === 37) this.x -= 50
+		},
 		collide: function()	{
 			this.state = this.states.Stopped;
 		},
@@ -79,20 +82,29 @@
 		this.period = period;
 		this.canvas = canvas;
 		this.objects = objects;
-		this.canvas.onMouseDown(function(e) {
-			game.eventQueue.push(function(entity) {
-				var point = new Point(e.pageX, e.pageY) 
-				if(point.within(entity.bound)) {
-					tell(entity, 'mouseDown', point);
-				}
-			})
-		}.bind(this))
+		this.canvas.onMouseDown(this.onMouseDown.bind(this));
+		this.canvas.onKeyPress(this.onKeyPress.bind(this));
 	}
 
 	Game.prototype = {
-		eventQueue: [],
+		dispatch: function(action, self){
+			this.objects.forEach(action, self);
+		},
+		onMouseDown: function(e) {
+			var point = new Point(e.pageX, e.pageY) 
+			this.dispatch(function(entity){
+				if(point.within(entity.bound)) {
+					tell(entity, 'mouseDown', point);
+				}	
+			})
+		},
+		onKeyPress: function(e) {
+			this.dispatch(function(entity){
+				tell(entity, 'keyPress', e.keyCode)
+			})
+		},
 		updateTime: function(t) {
-			this.objects.forEach(function(o) {
+			this.dispatch(function(o) {
 				tell(o, 'update', t);
 			});
 		}, 
@@ -105,28 +117,18 @@
 				})
 			}, this);
 		},
-		updateEvents: function() {
-			this.eventQueue.forEach(function(e){
-				this.objects.forEach(function(o) {
-					e(o);
-				})
-			}, this)
-			this.eventQueue = [];
-		},
-
 		update: function(t) {
-			this.updateEvents();
 			this.updateCollisions();
 			this.updateTime(t);
 
 
-			this.objects.forEach(function(o){ 
+			this.dispatch(function(o){ 
 				run(o);
 			})
 		},
 		render: function() {
 			this.canvas.clear();
-			this.objects.forEach(function(o){
+			this.dispatch(function(o){
 				o.render(this.canvas);
 			}, this)
 		}, 
