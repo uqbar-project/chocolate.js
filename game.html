@@ -16,23 +16,9 @@
 		}, period * 1000);
 	}
 
-	function tell(entity, action, args) {
-		entity.mailbox.push(function(){
-			var handler = entity[action];
-			handler && handler.call(entity, args);
-		});
-	}
-
-	function run(entity) {
-		var mailbox = entity.mailbox;
-		entity.mailbox = [];
-		mailbox.forEach(function(it){ it() });
-	}
-
 	var Square = {
 		x: 0, 
 		selected: false,
-		mailbox: [],
 		states: {
 			Moving: { 
 				update: function(t) {
@@ -65,7 +51,6 @@
 	};
 
 	var Wall = { 
-		mailbox: [],
 		hitted: false, 
 		render: function(canvas) {
 			canvas.drawRectangle(this.bound, this.hitted ? '#FF2020' : null);
@@ -78,6 +63,44 @@
 		}
 	};
 
+	function ActorRef(actor){
+		this._actor = actor;
+	}
+
+	ActorRef.prototype = {
+		tell: function(action, arg) {
+			var definition = this._actor._definition;
+			var mailbox = this._actor.mailbox;
+			mailbox.push(function(){
+				var handler = definition[action];
+				handler && handler.call(definition, arg);
+			});
+		}
+	}
+
+	function Actor(definition) {
+		this._definition = definition;
+		this._ref = new ActorRef(this);
+	}
+
+	Actor.prototype = {
+		mailbox: [],
+		get ref() {
+			return this._ref;
+		},
+		run: function() {
+			var mailbox = this.mailbox;
+			this.mailbox = [];
+			mailbox.forEach(function(it){ it() });
+		},
+		render: function(canvas) {
+			this._definition.render(canvas)
+		},
+		get bound() {
+			return this._definition.bound
+		}
+	}
+
 	function Game(period, canvas, objects) {
 		this.period = period;
 		this.canvas = canvas;
@@ -87,32 +110,44 @@
 	}
 
 	Game.prototype = {
-		dispatch: function(action, self){
-			this.objects.forEach(action, self);
+		actors: [],
+		get refs() {
+			return this.actors.map(function(actor){
+				return actor.ref
+			})
+		},
+		createActor: function(definition){
+			this.actors.push(new Actor(definition))
+		},
+		dispatch: function(action, _this){
+			this.refs.forEach(action, _this);
+		},
+		exec: function(action, _this) {
+			this.actors.forEach(action, _this);
 		},
 		onMouseDown: function(e) {
 			var point = new Point(e.pageX, e.pageY) 
-			this.dispatch(function(entity){
-				if(point.within(entity.bound)) {
-					tell(entity, 'mouseDown', point);
+			this.exec(function(actor){
+				if(point.within(actor.bound)) {
+					actor.ref.tell('mouseDown', point);
 				}	
 			})
 		},
 		onKeyPress: function(e) {
-			this.dispatch(function(entity){
-				tell(entity, 'keyPress', e.keyCode)
+			this.dispatch(function(ref){
+				ref.tell('keyPress', e.keyCode)
 			})
 		},
 		updateTime: function(t) {
-			this.dispatch(function(o) {
-				tell(o, 'update', t);
+			this.dispatch(function(ref) {
+				ref.tell('update', t);
 			});
 		}, 
 		updateCollisions: function() {
-			this.objects.forEach(function(o){
-				this.objects.forEach(function(o2) {
-					if(o !== o2 && o.bound.collides(o2.bound)) {
-						tell(o, 'collide', o2);
+			this.exec(function(actor){
+				this.exec(function(actor2) {
+					if(actor !== actor2 && actor.bound.collides(actor2.bound)) {
+						actor.ref.tell('collide', actor2.ref);
 					}
 				})
 			}, this);
@@ -121,15 +156,14 @@
 			this.updateCollisions();
 			this.updateTime(t);
 
-
-			this.dispatch(function(o){ 
-				run(o);
+			this.exec(function(actor){ 
+				actor.run();
 			})
 		},
 		render: function() {
 			this.canvas.clear();
-			this.dispatch(function(o){
-				o.render(this.canvas);
+			this.exec(function(actor){
+				actor.render(this.canvas);
 			}, this)
 		}, 
 		loop: function (t) {
@@ -143,7 +177,9 @@
 
 
 	var canvas1 = new Canvas('canvas');
-	var game = new Game(0.1, canvas1, [Square, Wall]);
+	var game = new Game(0.1, canvas1);
+	game.createActor(Square)
+	game.createActor(Wall)
 	game.run();
 	//entity: actor(id + state + behaviour) + bounding + visual rendering 
 	</script>
