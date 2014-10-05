@@ -11,55 +11,59 @@
 	<script src="actor.js"></script>
 	<script src="game.js"></script>
 	<script>
-	var Square = {
-		x: 0, 
-		selected: false,
-		states: {
-			Moving: { 
-				update: function(t) {
-					this.x += 50 * t;
-				}
-			}, 
-			Stopped: {
-				update: function(t) {}
+
+	var Stopped = { 
+		mouseDown: function(self, value) {
+			value.selected = !value.selected;
+		},
+		keyPress: function(self, value, keyCode){
+			if(value.selected && keyCode === 37) {
+				value.x -= 50
 			}
+		}
+	}
+
+	var Moving = Object.create(Stopped)
+	Moving.update = function(self, value, t) {
+		value.x += 50 * t 
+	};
+	Moving.collide = function(self, value){
+		self.become(Stopped)
+	}
+
+	var Square = {
+		value: {
+			x: 0, 
+			selected: false
 		},
-		update: function(t) {
-			this.state = this.state || this.states.Moving;
-			this.state.update.call(this, t); 
+		behaviour: Moving,
+		render: function(value, bound, canvas) {
+			canvas.drawRectangle(bound, value.selected ? '#0ED600' : '#8ED6FF');
 		},
-		mouseDown: function() {
-			this.selected = !this.selected;
-		},
-		keyPress: function(keyCode){
-			if(this.selected && keyCode === 37) this.x -= 50
-		},
-		collide: function()	{
-			this.state = this.states.Stopped;
-		},
-		render: function(canvas) {
-			canvas.drawRectangle(this.bound, this.selected ? '#0ED600' : '#8ED6FF');
-		},
-		get bound() {
-			return new Rectangle(this.x, 0, 100, 100)
+		bound: function(value) {
+			return new Rectangle(value.x, 0, 100, 100)
 		}
 	};
 
-	var Wall = { 
-		hitted: false, 
-		render: function(canvas) {
+	var Wall = {
+		value: {
+			hitted: false, 
+		},
+		behaviour: {
+			collide: function(self, value) {
+				this.hitted = true;
+			}
+		},
+		render: function(value, bound, canvas) {
 			canvas.drawRectangle(this.bound, this.hitted ? '#FF2020' : null);
 		},
-		collide: function() {
-			this.hitted = true;
-		},
-		get bound() {
+		bound: function(value) {
 			return new Rectangle(400, 0, 10, 180)
 		}
 	};
 
 	var canvas1 = new Canvas('canvas');
-	var game = new Game(0.1, canvas1);
+	var game = new Game(0.01, canvas1);
 	game.createActor(Square)
 	game.createActor(Wall)
 	game.run();

@@ -1,9 +1,12 @@
 var expect = chai.expect;
 
 describe('Actor', function() {
+	var bound = {x: 0, y: 0, width: 10, height: 10};
  	var def = {
- 		bound: {x: 0, y: 0, width: 10, height: 10}
- 	}
+ 		value: {},
+ 		behaviour: {},
+ 		bound: function(){ return bound }
+ 	};
  	var actor;
 
  	before(function(){
@@ -28,7 +31,7 @@ describe('Actor', function() {
 
 	describe('bound', function(){
 		it('answers bound as in definition', function(){
-			expect(actor.bound).to.equal(def.bound)
+			expect(actor.bound).to.equal(bound)
 		})
 	})
 
