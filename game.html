@@ -19,13 +19,14 @@
 		keyPress: function(self, value, keyCode){
 			if(value.selected && keyCode === 37) {
 				value.x -= 50
+				self.become(Moving)
 			}
 		}
 	}
 
 	var Moving = Object.create(Stopped)
-	Moving.update = function(self, value, t) {
-		value.x += 50 * t 
+	Moving.update = function(self, value, dt) {
+		value.x += 100 * dt 
 	};
 	Moving.collide = function(self, value){
 		self.become(Stopped)
@@ -50,12 +51,15 @@
 			hitted: false, 
 		},
 		behaviour: {
+			resume: function(self, value){
+				value.hitted = false;
+			},
 			collide: function(self, value) {
-				this.hitted = true;
+				value.hitted = true;
 			}
 		},
 		render: function(value, bound, canvas) {
-			canvas.drawRectangle(this.bound, this.hitted ? '#FF2020' : null);
+			canvas.drawRectangle(bound, value.hitted ? '#FF2020' : null);
 		},
 		bound: function(value) {
 			return new Rectangle(400, 0, 10, 180)

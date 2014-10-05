@@ -1,8 +1,16 @@
+var time;
 function schedule(loop, period) {
-	loop(0);
-	setInterval(function(){
-		loop(period)
-	}, period * 1000);
+	(function _schedule(){
+		requestAnimationFrame(function() {
+			var now = new Date().getTime();
+			var dt = now - (time || now);
+			time = now;
+
+			_schedule();
+			
+			loop(dt / 1000)
+		});     
+	})();
 }
 
 function Game(period, canvas, objects) {
@@ -62,6 +70,9 @@ Game.prototype = {
 
 		this.exec(function(actor){ 
 			actor.run();
+		});
+		this.dispatch(function(ref){
+			ref.tell('resume');
 		})
 	},
 	render: function() {
