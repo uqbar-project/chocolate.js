@@ -20,7 +20,11 @@ ActorRef.prototype = {
 	},
 	createActor: function(definition){
 		this._actor.system.createActor(definition);
+	},
+	destroy: function() {
+		this._actor.system.destroyActor(this._actor);
 	}
+
 }
 
 function Actor(definition) {

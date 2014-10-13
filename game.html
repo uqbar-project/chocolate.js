@@ -58,7 +58,10 @@
 	var LittleSquare = {
 		value: {x: 400},
 		behaviour: {
-			update: Moving.update
+			update: Moving.update,
+			hide: function(self) {
+				self.destroy();
+			}
 		},
 		render: function(value, bound, canvas) {
 			canvas.drawRectangle(bound);

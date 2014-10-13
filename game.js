@@ -60,6 +60,9 @@ Game.prototype = {
 		actor.system = this;
 		this.actors.push(actor);
 	},
+	destroyActor: function(actor) {
+		//TODO
+	},
 	dispatch: function(action, _this){
 		this.refs.forEach(action, _this);
 	},
