@@ -13,6 +13,17 @@ function schedule(loop, period) {
 	})();
 }
 
+function tellCollisions(actor, actor2) {
+	if(actor.bound.collides(actor2.bound)) {
+		if(!actor.collisions.included(actor2)) {
+			actor.ref.tell('collide', actor2.ref);
+		}
+		actor.collisions.push(actor2)
+	} else if(actor.collisions.included(actor2)) {
+		actor.ref.tell('uncollide', actor2.ref);
+	}
+}
+
 function Game(period, canvas, objects) {
 	this.period = period;
 	this.canvas = canvas;
@@ -66,17 +77,10 @@ Game.prototype = {
 	updateCollisions: function() {
 		this.exec(function(actor){
 			actor.collisions.clear();
-			this.exec(function(actor2) {
-				if(actor !== actor2) {
-					if(actor.bound.collides(actor2.bound)) {
-						if(!actor.collisions.included(actor2)) {
-							actor.ref.tell('collide', actor2.ref);
-						}
-						actor.collisions.push(actor2)
-					} else if(actor.collisions.included(actor2)) {
-						actor.ref.tell('uncollide', actor2.ref);
-					}
-				}
+			this.actors.filter(function(a) { 
+				return a !== actor 
+			}).forEach(function(actor2) {
+				tellCollisions(actor, actor2)
 			})
 		}, this);
 	},
