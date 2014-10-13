@@ -1,3 +1,4 @@
+//Object for sending messages to an actor
 function ActorRef(actor) {
 	this._actor = actor;
 }
@@ -5,16 +6,21 @@ function ActorRef(actor) {
 ActorRef.prototype = {
 	tell: function(action, arg) {
 		var behaviour = this._actor._behaviour;
+		var context = this._actor._context;
 		var value = this._actor.value;
-		var self = this;
-		var mailbox = this._actor.mailbox;
-		mailbox.push(function(){
+		this._actor.mailbox.push(function(){
 			var handler = behaviour[action];
-			handler && handler(self, value, arg)
+			handler && handler(context, value, arg);
 		});
-	},
+	}
+}
 
-//TODO move out from here
+//Object for altering the actor system
+function ActorContext(actor){
+	this._actor = actor;
+}
+
+ActorContext.prototype = {
 	become: function(newBehaviour) {
 		this._actor._behaviour = newBehaviour
 	},
@@ -23,8 +29,10 @@ ActorRef.prototype = {
 	},
 	destroy: function() {
 		this._actor.system.destroyActor(this._actor);
-	}
-
+	},
+	get self() {
+		return this._actor.ref;
+	},
 }
 
 function Actor(definition) {
@@ -32,6 +40,7 @@ function Actor(definition) {
 	this._behaviour = definition.behaviour;
 	this._render = definition.render;
 	this._bound = definition.bound;
+	this._context = new ActorContext(this);
 	this.ref = new ActorRef(this);
 }
 

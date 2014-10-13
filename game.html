@@ -24,23 +24,23 @@
 	}
 
 	var Stopped = { 
-		mouseDown: function(self, value) {
+		mouseDown: function(context, value) {
 			value.selected = !value.selected;
 		},
-		keyPress: function(self, value, keyCode){
+		keyPress: function(context, value, keyCode){
 			if(value.selected && keyCode === 37) {
 				value.x -= 50
-				self.become(Moving)
+				context.become(Moving)
 			}
 		}
 	}
 
 	var Moving = Object.create(Stopped)
-	Moving.update = function(self, value, dt) {
+	Moving.update = function(context, value, dt) {
 		value.x += 100 * dt 
 	};
-	Moving.collide = function(self, value){
-		self.become(Stopped)
+	Moving.collide = function(context){
+		context.become(Stopped)
 	}
 
 	var Square = {
@@ -59,8 +59,8 @@
 		value: {x: 400},
 		behaviour: {
 			update: Moving.update,
-			hide: function(self) {
-				self.destroy();
+			hide: function(context) {
+				context.destroy();
 			}
 		},
 		render: function(value, bound, canvas) {
@@ -74,11 +74,11 @@
 			touching: false, 
 		},
 		behaviour: {
-			collide: function(self, value) {
+			collide: function(context, value) {
 				value.touching = true;
-				self.createActor(LittleSquare)
+				context.createActor(LittleSquare)
 			},
-			uncollide: function(self, value) {
+			uncollide: function(context, value) {
 				value.touching = false;
 			}
 		},
