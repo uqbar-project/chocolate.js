@@ -14,8 +14,12 @@ ActorRef.prototype = {
 		});
 	},
 
+//TODO move out from here
 	become: function(newBehaviour) {
 		this._actor._behaviour = newBehaviour
+	},
+	createActor: function(definition){
+		this._actor.system.createActor(definition);
 	}
 }
 

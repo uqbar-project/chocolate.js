@@ -29,7 +29,9 @@ Game.prototype = {
 		})
 	},
 	createActor: function(definition){
-		this.actors.push(new Actor(definition))
+		var actor = new Actor(definition);
+		actor.system = this;
+		this.actors.push(actor);
 	},
 	dispatch: function(action, _this){
 		this.refs.forEach(action, _this);
