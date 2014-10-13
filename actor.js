@@ -36,8 +36,12 @@ ActorContext.prototype = {
 }
 
 function Actor(definition) {
-	this.value = Object.create(definition.value);
-	this._behaviour = definition.behaviour;
+	this.value = Object.create(definition.value || {});
+	this._behaviour = definition.behaviour || {};
+
+	validateExists(definition.render, "render method");
+	validateExists(definition.bound, "bound method");
+
 	this._render = definition.render;
 	this._bound = definition.bound;
 	this._context = new ActorContext(this);

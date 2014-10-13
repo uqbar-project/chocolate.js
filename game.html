@@ -12,17 +12,10 @@
 	<script src="versioned-queue.js"></script>
 	<script src="game.js"></script>
 	<script src="key-codes.js"></script>
+	<script src="appearance.js"></script>
+	<script src="validate.js"></script>
 	<script>
 
-	function rectangular(baseRectangle) {
-		return function(bound) {
-			return new Rectangle(
-				bound.x || baseRectangle.x,
-				bound.y || baseRectangle.y, 
-				bound.width || baseRectangle.width,
-				bound.height || baseRectangle.height);
-		}
-	}
 
 	var Stopped = { 
 		mouseDown: function(context, value) {
