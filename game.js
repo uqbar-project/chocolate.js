@@ -24,6 +24,20 @@ function tellCollisions(actor, actor2) {
 	}
 }
 
+function tellVisibility(actor, canvasBound) {
+	if(actor.bound.collides(canvasBound)) {
+		if(!actor.visible) {
+			actor.ref.tell('show');
+		}
+		actor.visible = true;
+	} else {
+		if(actor.visible) {
+			actor.ref.tell('hide');
+		}
+		actor.visible = false;
+	}
+}
+
 function Game(period, canvas, objects) {
 	this.period = period;
 	this.canvas = canvas;
@@ -42,6 +56,7 @@ Game.prototype = {
 	createActor: function(definition){
 		var actor = new Actor(definition);
 		actor.collisions = new VersionedQueue();
+		actor.visible = false;
 		actor.system = this;
 		this.actors.push(actor);
 	},
@@ -64,7 +79,7 @@ Game.prototype = {
 			ref.tell('keyPress', e.keyCode)
 		})
 	},
-	resume: function(){
+	updateResume: function(){
 		this.dispatch(function(ref){
 			ref.tell('resume');
 		});
@@ -75,7 +90,7 @@ Game.prototype = {
 		});
 	}, 
 	updateCollisions: function() {
-		this.exec(function(actor){
+		this.exec(function(actor) {
 			actor.collisions.clear();
 			this.actors.filter(function(a) { 
 				return a !== actor 
@@ -84,19 +99,29 @@ Game.prototype = {
 			})
 		}, this);
 	},
+	updateVisibility: function() {
+		this.exec(function(actor) {
+			tellVisibility(actor, this.canvas.bound)
+		}, this);
+	},
 	update: function(t) {
 		this.updateCollisions();
 		this.updateTime(t);
+		this.updateVisibility();
 
 		this.exec(function(actor){ 
 			actor.run();
 		});
-		this.resume();
+		this.updateResume();
+
+		this.render();
 	},
 	render: function() {
 		this.canvas.clear();
-		this.exec(function(actor){
-			actor.render(this.canvas);
+		this.actors.filter(function(actor){
+			return actor.visible
+		}).forEach(function(actor){
+			actor.render(this.canvas)
 		}, this)
 	}, 
 	loop: function (t) {

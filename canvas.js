@@ -20,5 +20,8 @@ Canvas.prototype = {
 	}, 
 	clear: function(){
 		this.context.clearRect(0, 0, this.innerCanvas.width, this.innerCanvas.height)
+	},
+	get bound() {
+		return new Rectangle(0, 0, this.innerCanvas.width, this.innerCanvas.height);
 	}
 }
