@@ -1,5 +1,5 @@
 var time;
-function schedule(loop, period) {
+function schedule(loop) {
 	(function _schedule(){
 		requestAnimationFrame(function() {
 			var now = new Date().getTime();
@@ -38,10 +38,8 @@ function tellVisibility(actor, canvasBound) {
 	}
 }
 
-function Game(period, canvas, objects) {
-	this.period = period;
+function Game(canvas) {
 	this.canvas = canvas;
-	this.objects = objects;
 	this.canvas.onMouseDown(this.onMouseDown.bind(this));
 	this.canvas.onKeyPress(this.onKeyPress.bind(this));
 }
@@ -132,6 +130,6 @@ Game.prototype = {
 		this.render();
 	},
 	run: function() {
-		schedule(this.loop.bind(this), this.period)
+		schedule(this.loop.bind(this))
 	}
 }

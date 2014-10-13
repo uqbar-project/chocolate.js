@@ -90,9 +90,9 @@
 	};
 
 	var canvas1 = new Canvas('canvas');
-	var game = new Game(0.01, canvas1);
-	game.createActor(Square)
-	game.createActor(Wall)
+	var game = new Game(canvas1);
+	game.createActor(Square);
+	game.createActor(Wall);
 	game.run();
 	//entity: actor(id + state + behaviour) + bounding + visual rendering 
 	</script>
