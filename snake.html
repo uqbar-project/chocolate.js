@@ -1,0 +1,132 @@
+
+<html>
+<head></head>
+<body>
+	<div>
+		<canvas id="canvas" tabindex="1" width="500" height="500"></canvas>
+	</div>
+	<script src="axe.js"></script>
+	<script src="point.js"></script>
+	<script src="rectangle.js"></script>
+	<script src="canvas.js"></script>
+	<script src="actor.js"></script>
+	<script src="versioned-queue.js"></script>
+	<script src="game.js"></script>
+	<script src="key-codes.js"></script>
+	<script src="validate.js"></script>
+	<script src="appearance.js"></script>
+	<script src="composite.js"></script>
+	<script>
+
+
+//TODO resize, abstract from pixel numbers
+//TODO apparaence = bound + render. f(value)
+
+	var Cell = rectangular({width:10, height:10});
+
+	function newHead(value) {
+		var head = value.rings[0];
+		var delta;
+		if (value.direction == "left") {
+			delta = {x:-10}
+		} else if (value.direction == "right") {
+			delta = {x:10}
+		} else if (value.direction == "up") {
+			delta = {y:-10}
+		} else  {
+			delta = {y:10}
+		}
+		return head.update(delta)
+	}
+
+	function SlowTime(period){
+		this.elapsedTime = 0;
+		this.period = period;
+	}
+
+	SlowTime.prototype = {
+		elapse: function(dt) {
+			this.elapsedTime += dt;
+		},
+		tick: function(dt, action) {
+			this.elapse(dt);
+			if(this.elapsedTime >= this.period) {
+				action(this.period);
+				this.elapsedTime = 0;
+			}
+		}
+	}
+
+	var Snake = {
+		value: {
+			time: new SlowTime(0.4),
+			rings: [ 
+				new Point(20, 120), 
+				new Point(20, 130), 
+				new Point(20, 140), 
+				new Point(20, 150) ],
+			direction: "up",
+			directionRequest: "up",
+		}, 
+		behaviour: {
+			collide: function(context, value) {
+				value.rings.push(newHead(value))
+			},
+			keyPress: function(context, value, keyCode){
+				if(keyCode === KeyCodes.LEFT_ARROW && value.direction !== "right") {
+					value.directionRequest = "left"
+				} else if (keyCode === KeyCodes.RIGHT_ARROW && value.direction !== "left") {
+					value.directionRequest = "right"
+				} else if (keyCode === KeyCodes.UP_ARROW && value.direction !== "down") {
+					value.directionRequest = "up"
+				} else if (keyCode === KeyCodes.DOWN_ARROW && value.direction !== "up") {
+					value.directionRequest = "down"
+				}  
+			},
+			update: function(context, value, dt) {
+				value.time.tick(dt, function(){
+					value.direction = value.directionRequest;
+					value.rings.pop()
+					value.rings.unshift(newHead(value))
+				})
+			}
+		},
+		render: function(value, bound, canvas) {
+			bound.parts.forEach(function(p){
+				canvas.drawRectangle(p)
+			})
+		}, 
+		bound: function(value) {
+			return new Composite(value.rings.map(Cell))
+		}
+	}
+
+	function roundTo(number, divisor) {
+		return Math.floor(numer / divisor) * divisor;
+	}
+
+	var Food = {
+		value: {
+			x:200, 
+			y:200,
+		},
+		behaviour: {
+			collide: function(context, value) {
+				value.x = roundTo(Math.random() * 500, 10)
+				value.y = roundTo(Math.random() * 500, 10)
+			}
+		},
+		render: function(value, bound, canvas) {
+			canvas.drawRectangle(bound, '#101010');
+		}, 
+		bound: Cell
+	}
+
+	var canvas1 = new Canvas('canvas');
+	var game = new Game(canvas1);
+	game.createActor(Food);
+	game.createActor(Snake);
+	game.run();
+	</script>
+</body>
+</html>
