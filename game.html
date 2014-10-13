@@ -11,6 +11,7 @@
 	<script src="actor.js"></script>
 	<script src="versioned-queue.js"></script>
 	<script src="game.js"></script>
+	<script src="key-codes.js"></script>
 	<script>
 
 	function rectangular(baseRectangle) {
@@ -28,7 +29,7 @@
 			value.selected = !value.selected;
 		},
 		keyPress: function(context, value, keyCode){
-			if(value.selected && keyCode === 37) {
+			if(value.selected && keyCode === KeyCodes.LEFT_ARROW) {
 				value.x -= 50
 				context.become(Moving)
 			}
