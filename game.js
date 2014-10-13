@@ -59,9 +59,18 @@ Game.prototype = {
 	}, 
 	updateCollisions: function() {
 		this.exec(function(actor){
+			var collisions = actor.collisions || [];
+			actor.collisions = [];
 			this.exec(function(actor2) {
-				if(actor !== actor2 && actor.bound.collides(actor2.bound)) {
-					actor.ref.tell('collide', actor2.ref);
+				if(actor !== actor2) {
+					if(actor.bound.collides(actor2.bound)) {
+						if(collisions.indexOf(actor2) === -1) {
+							actor.ref.tell('collide', actor2.ref);
+						}
+						actor.collisions.push(actor2)
+					} else if(collisions.indexOf(actor2) !== -1) {
+						actor.ref.tell('uncollide', actor2.ref);
+					}
 				}
 			})
 		}, this);

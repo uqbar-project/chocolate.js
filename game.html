@@ -12,6 +12,16 @@
 	<script src="game.js"></script>
 	<script>
 
+	function rectangular(baseRectangle) {
+		return function(bound) {
+			return new Rectangle(
+				bound.x || baseRectangle.x,
+				bound.y || baseRectangle.y, 
+				bound.width || baseRectangle.width,
+				bound.height || baseRectangle.height);
+		}
+	}
+
 	var Stopped = { 
 		mouseDown: function(self, value) {
 			value.selected = !value.selected;
@@ -41,29 +51,37 @@
 		render: function(value, bound, canvas) {
 			canvas.drawRectangle(bound, value.selected ? '#0ED600' : '#8ED6FF');
 		},
-		bound: function(value) {
-			return new Rectangle(value.x, 0, 100, 100)
-		}
+		bound: rectangular({y:0, width: 100, height: 100})
 	};
+
+	var LittleSquare = {
+		value: {x: 400},
+		behaviour: {
+			update: Moving.update
+		},
+		render: function(value, bound, canvas) {
+			canvas.drawRectangle(bound);
+		},
+		bound: rectangular({y:50, width: 10, height: 10})
+	}
 
 	var Wall = {
 		value: {
-			hitted: false, 
+			touching: false, 
 		},
 		behaviour: {
-			resume: function(self, value){
-				value.hitted = false;
-			},
 			collide: function(self, value) {
-				value.hitted = true;
+				value.touching = true;
+				self.createActor(LittleSquare)
+			},
+			uncollide: function(self, value) {
+				value.touching = false;
 			}
 		},
 		render: function(value, bound, canvas) {
-			canvas.drawRectangle(bound, value.hitted ? '#FF2020' : null);
+			canvas.drawRectangle(bound, value.touching ? '#FF2020' : null);
 		},
-		bound: function(value) {
-			return new Rectangle(400, 0, 10, 180)
-		}
+		bound: rectangular(new Rectangle(400, 0, 10, 180))
 	};
 
 	var canvas1 = new Canvas('canvas');
