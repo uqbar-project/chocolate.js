@@ -30,6 +30,7 @@ Game.prototype = {
 	},
 	createActor: function(definition){
 		var actor = new Actor(definition);
+		actor.collisions = new VersionedQueue();
 		actor.system = this;
 		this.actors.push(actor);
 	},
@@ -52,6 +53,11 @@ Game.prototype = {
 			ref.tell('keyPress', e.keyCode)
 		})
 	},
+	resume: function(){
+		this.dispatch(function(ref){
+			ref.tell('resume');
+		});
+	},
 	updateTime: function(t) {
 		this.dispatch(function(ref) {
 			ref.tell('update', t);
@@ -59,16 +65,15 @@ Game.prototype = {
 	}, 
 	updateCollisions: function() {
 		this.exec(function(actor){
-			var collisions = actor.collisions || [];
-			actor.collisions = [];
+			actor.collisions.clear();
 			this.exec(function(actor2) {
 				if(actor !== actor2) {
 					if(actor.bound.collides(actor2.bound)) {
-						if(collisions.indexOf(actor2) === -1) {
+						if(!actor.collisions.included(actor2)) {
 							actor.ref.tell('collide', actor2.ref);
 						}
 						actor.collisions.push(actor2)
-					} else if(collisions.indexOf(actor2) !== -1) {
+					} else if(actor.collisions.included(actor2)) {
 						actor.ref.tell('uncollide', actor2.ref);
 					}
 				}
@@ -82,9 +87,7 @@ Game.prototype = {
 		this.exec(function(actor){ 
 			actor.run();
 		});
-		this.dispatch(function(ref){
-			ref.tell('resume');
-		})
+		this.resume();
 	},
 	render: function() {
 		this.canvas.clear();
