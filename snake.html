@@ -16,45 +16,23 @@
 	<script src="validate.js"></script>
 	<script src="appearance.js"></script>
 	<script src="composite.js"></script>
+	<script src="slow-time.js"></script>
 	<script>
 
+	function roundTo(number, divisor) {
+		return Math.floor(numer / divisor) * divisor;
+	}
 
 //TODO resize, abstract from pixel numbers
 //TODO apparaence = bound + render. f(value)
 
 	var Cell = rectangular({width:10, height:10});
 
+
+
 	function newHead(value) {
 		var head = value.rings[0];
-		var delta;
-		if (value.direction == "left") {
-			delta = {x:-10}
-		} else if (value.direction == "right") {
-			delta = {x:10}
-		} else if (value.direction == "up") {
-			delta = {y:-10}
-		} else  {
-			delta = {y:10}
-		}
-		return head.update(delta)
-	}
-
-	function SlowTime(period){
-		this.elapsedTime = 0;
-		this.period = period;
-	}
-
-	SlowTime.prototype = {
-		elapse: function(dt) {
-			this.elapsedTime += dt;
-		},
-		tick: function(dt, action) {
-			this.elapse(dt);
-			if(this.elapsedTime >= this.period) {
-				action(this.period);
-				this.elapsedTime = 0;
-			}
-		}
+		return head.update(value.direction.delta(10))
 	}
 
 	var Snake = {
@@ -65,23 +43,18 @@
 				new Point(20, 130), 
 				new Point(20, 140), 
 				new Point(20, 150) ],
-			direction: "up",
-			directionRequest: "up",
+			direction: Up,
+			directionRequest: Up,
 		}, 
 		behaviour: {
 			collide: function(context, value) {
 				value.rings.push(newHead(value))
 			},
 			keyPress: function(context, value, keyCode){
-				if(keyCode === KeyCodes.LEFT_ARROW && value.direction !== "right") {
-					value.directionRequest = "left"
-				} else if (keyCode === KeyCodes.RIGHT_ARROW && value.direction !== "left") {
-					value.directionRequest = "right"
-				} else if (keyCode === KeyCodes.UP_ARROW && value.direction !== "down") {
-					value.directionRequest = "up"
-				} else if (keyCode === KeyCodes.DOWN_ARROW && value.direction !== "up") {
-					value.directionRequest = "down"
-				}  
+				var direction = Direction.fromKeyCode(keyCode)
+				if(direction && !direction.oppositeOf(value.direction)) {
+					value.directionRequest = direction;
+				}
 			},
 			update: function(context, value, dt) {
 				value.time.tick(dt, function(){
@@ -99,10 +72,6 @@
 		bound: function(value) {
 			return new Composite(value.rings.map(Cell))
 		}
-	}
-
-	function roundTo(number, divisor) {
-		return Math.floor(numer / divisor) * divisor;
 	}
 
 	var Food = {
