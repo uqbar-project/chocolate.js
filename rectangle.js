@@ -17,8 +17,12 @@ Rectangle.prototype = {
 
 	collides: function(other) {
 		return this.points.some(function(point){
-			return point.within(other)
+			return other.includesPoint(point);
 		}, this)
+	},
+
+	includesPoint: function(point) {
+		return point.within(this);
 	},
 
 	toString: function() {
