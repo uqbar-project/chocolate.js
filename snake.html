@@ -37,7 +37,6 @@
 
 	var Snake = {
 		value: {
-			time: new SlowTime(0.4),
 			rings: [ 
 				new Point(20, 120), 
 				new Point(20, 130), 
@@ -57,11 +56,9 @@
 				}
 			},
 			update: function(context, value, dt) {
-				value.time.tick(dt, function(){
-					value.direction = value.directionRequest;
-					value.rings.pop()
-					value.rings.unshift(newHead(value))
-				})
+				value.direction = value.directionRequest;
+				value.rings.pop()
+				value.rings.unshift(newHead(value))
 			}
 		},
 		render: function(value, bound, canvas) {
@@ -92,9 +89,9 @@
 	}
 
 	var canvas1 = new Canvas('canvas');
-	var game = new Game(canvas1);
-	game.createActor(Food);
+	var game = new Game(canvas1, 0.4);
 	game.createActor(Snake);
+	game.createActor(Food);
 	game.run();
 	</script>
 </body>

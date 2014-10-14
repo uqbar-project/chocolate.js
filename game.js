@@ -38,10 +38,11 @@ function tellVisibility(actor, canvasBound) {
 	}
 }
 
-function Game(canvas) {
+function Game(canvas, maxPeriod) {
 	this.canvas = canvas;
 	this.canvas.onMouseDown(this.onMouseDown.bind(this));
 	this.canvas.onKeyPress(this.onKeyPress.bind(this));
+	this.slowTime = new SlowTime(maxPeriod || 0);
 }
 
 Game.prototype = {
@@ -106,16 +107,18 @@ Game.prototype = {
 		}, this);
 	},
 	update: function(t) {
-		this.updateCollisions();
-		this.updateTime(t);
-		this.updateVisibility();
+		this.slowTime.tick(t, function(){
+			this.updateCollisions();
+			this.updateTime(t);
+			this.updateVisibility();
 
-		this.exec(function(actor){ 
-			actor.run();
-		});
-		this.updateResume();
+			this.exec(function(actor){ 
+				actor.run();
+			});
+			this.updateResume();
 
-		this.render();
+			this.render();
+		}.bind(this))
 	},
 	render: function() {
 		this.canvas.clear();
