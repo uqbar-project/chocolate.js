@@ -5,7 +5,8 @@ describe('Actor', function() {
  	var def = {
  		value: {},
  		behaviour: {},
- 		bound: function(){ return bound }
+ 		bound: function(){ return bound },
+ 		render: function(){}
  	};
  	var actor;
 
