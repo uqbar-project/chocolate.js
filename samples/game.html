@@ -4,20 +4,22 @@
 	<div>
 		<canvas id="canvas" tabindex="1" width="800" height="100"></canvas>
 	</div>
-	<script src="../src/axe.js"></script>
-	<script src="../src/point.js"></script>
-	<script src="../src/rectangle.js"></script>
-	<script src="../src/canvas.js"></script>
+	<script src="../src/geometry/axe.js"></script>
+	<script src="../src/geometry/point.js"></script>
+	<script src="../src/geometry/rectangle.js"></script>
+	<script src="../src/geometry/composite.js"></script>
+	
+	<script src="../src/utils/validate.js"></script>
+	<script src="../src/utils/key-codes.js"></script>
+	<script src="../src/utils/versioned-queue.js"></script>
+	<script src="../src/utils/canvas.js"></script>
+	
 	<script src="../src/actor.js"></script>
-	<script src="../src/versioned-queue.js"></script>
 	<script src="../src/game.js"></script>
-	<script src="../src/key-codes.js"></script>
 	<script src="../src/appearance.js"></script>
-	<script src="../src/validate.js"></script>
 	<script src="../src/slow-time.js"></script>
 
 	<script>
-
 
 	var Stopped = { 
 		mouseDown: function(context, value) {
