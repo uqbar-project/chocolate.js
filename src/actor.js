@@ -35,8 +35,11 @@ ActorContext.prototype = {
 	},
 }
 
+
 function Actor(definition) {
-	this.value = Object.create(definition.value || {});
+	function defaultInit() { return {} }
+
+	this.value = (definition.init || defaultInit)();
 	this._behaviour = definition.behaviour || {};
 
 	validateExists(definition.render, "render method");

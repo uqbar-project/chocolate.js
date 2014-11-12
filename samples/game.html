@@ -42,9 +42,11 @@
 	}
 
 	var Square = {
-		value: {
-			x: 0, 
-			selected: false
+		init: function(){
+			return {
+				x: 0,
+				selected: false
+			}
 		},
 		behaviour: Moving,
 		render: function(value, bound, canvas) {
@@ -54,7 +56,9 @@
 	};
 
 	var LittleSquare = {
-		value: {x: 400},
+		init: function() {
+			return {x: 400}
+		},
 		behaviour: {
 			update: Moving.update,
 			hide: function(context) {
@@ -68,8 +72,10 @@
 	}
 
 	var Wall = {
-		value: {
-			touching: false, 
+		init: function(){
+			return {
+				touching: false,
+			}
 		},
 		behaviour: {
 			collide: function(context, value) {
