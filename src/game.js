@@ -7,9 +7,9 @@ function schedule(loop) {
 			time = now;
 
 			_schedule();
-			
+
 			loop(dt / 1000)
-		});     
+		});
 	})();
 }
 
@@ -69,11 +69,11 @@ Game.prototype = {
 		this.actors.forEach(action, _this);
 	},
 	onMouseDown: function(e) {
-		var point = new Point(e.pageX, e.pageY) 
+		var point = new Point(e.pageX, e.pageY)
 		this.exec(function(actor){
 			if(point.within(actor.bound)) {
 				actor.ref.tell('mouseDown', point);
-			}	
+			}
 		})
 	},
 	onKeyPress: function(e) {
@@ -90,12 +90,12 @@ Game.prototype = {
 		this.dispatch(function(ref) {
 			ref.tell('update', t);
 		});
-	}, 
+	},
 	updateCollisions: function() {
 		this.exec(function(actor) {
 			actor.collisions.clear();
-			this.actors.filter(function(a) { 
-				return a !== actor 
+			this.actors.filter(function(a) {
+				return a !== actor
 			}).forEach(function(actor2) {
 				tellCollisions(actor, actor2)
 			})
@@ -112,7 +112,7 @@ Game.prototype = {
 			this.updateTime(t);
 			this.updateVisibility();
 
-			this.exec(function(actor){ 
+			this.exec(function(actor){
 				actor.run();
 			});
 			this.updateResume();
@@ -127,7 +127,7 @@ Game.prototype = {
 		}).forEach(function(actor){
 			actor.render(this.canvas)
 		}, this)
-	}, 
+	},
 	loop: function (t) {
 		this.update(t);
 		this.render();

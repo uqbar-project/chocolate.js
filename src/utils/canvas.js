@@ -17,7 +17,7 @@ Canvas.prototype = {
 		this.context.lineWidth = myRectangle.borderWidth;
 		this.context.strokeStyle = 'black';
 		this.context.stroke();
-	}, 
+	},
 	clear: function(){
 		this.context.clearRect(0, 0, this.innerCanvas.width, this.innerCanvas.height)
 	},

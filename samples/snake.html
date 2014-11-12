@@ -9,12 +9,12 @@
 	<script src="../src/geometry/point.js"></script>
 	<script src="../src/geometry/rectangle.js"></script>
 	<script src="../src/geometry/composite.js"></script>
-	
+
 	<script src="../src/utils/validate.js"></script>
 	<script src="../src/utils/key-codes.js"></script>
 	<script src="../src/utils/versioned-queue.js"></script>
 	<script src="../src/utils/canvas.js"></script>
-	
+
 	<script src="../src/actor.js"></script>
 	<script src="../src/game.js"></script>
 	<script src="../src/appearance.js"></script>
@@ -69,7 +69,7 @@
 			bound.parts.forEach(function(p){
 				canvas.drawRectangle(p)
 			})
-		}, 
+		},
 		bound: function(value) {
 			return new Composite(value.rings.map(Cell))
 		}
@@ -90,7 +90,7 @@
 		},
 		render: function(value, bound, canvas) {
 			canvas.drawRectangle(bound, '#101010');
-		}, 
+		},
 		bound: Cell
 	}
 

@@ -6,7 +6,7 @@ function Point(x, y) {
 Point.prototype = {
 	within: function(rectangle) {
 		return withinAxe(this, rectangle, Horizontal) && withinAxe(this, rectangle, Vertical);
-	}, 
+	},
 	update: function(delta){
 		return new Point(this.x + (delta.x || 0), this.y + (delta.y || 0));
 	},

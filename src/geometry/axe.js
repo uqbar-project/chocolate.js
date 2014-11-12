@@ -10,7 +10,7 @@ var Horizontal = {
 }
 
 var Vertical = {
-	position: function(it){return it.y}, 
+	position: function(it){return it.y},
 	setPosition: function(it, value) { it.y = value },
 	size:function(it) { return it.height },
 	delta: function(value) {
@@ -60,7 +60,7 @@ Direction.fromKeyCode = function(code) {
 	if(code === KeyCodes.RIGHT_ARROW) return Right;
 }
 
-var Left = new Direction(Horizontal, Backward) 
+var Left = new Direction(Horizontal, Backward)
 var Right = new Direction(Horizontal, Forward)
 var Up =  new Direction(Vertical, Backward)
 var Down = new Direction(Vertical, Forward)

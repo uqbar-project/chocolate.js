@@ -18,4 +18,4 @@ Composite.prototype = {
 	toString: function() {
 		return 'C[' + this.parts.join() +']'
 	}
-};	
+};

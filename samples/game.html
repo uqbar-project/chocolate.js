@@ -8,12 +8,12 @@
 	<script src="../src/geometry/point.js"></script>
 	<script src="../src/geometry/rectangle.js"></script>
 	<script src="../src/geometry/composite.js"></script>
-	
+
 	<script src="../src/utils/validate.js"></script>
 	<script src="../src/utils/key-codes.js"></script>
 	<script src="../src/utils/versioned-queue.js"></script>
 	<script src="../src/utils/canvas.js"></script>
-	
+
 	<script src="../src/actor.js"></script>
 	<script src="../src/game.js"></script>
 	<script src="../src/appearance.js"></script>
@@ -21,7 +21,7 @@
 
 	<script>
 
-	var Stopped = { 
+	var Stopped = {
 		mouseDown: function(context, value) {
 			value.selected = !value.selected;
 		},
@@ -35,7 +35,7 @@
 
 	var Moving = Object.create(Stopped)
 	Moving.update = function(context, value, dt) {
-		value.x += 100 * dt 
+		value.x += 100 * dt
 	};
 	Moving.collide = function(context){
 		context.become(Stopped)
@@ -97,7 +97,7 @@
 	game.createActor(Square);
 	game.createActor(Wall);
 	game.run();
-	//entity: actor(id + state + behaviour) + bounding + visual rendering 
+	//entity: actor(id + state + behaviour) + bounding + visual rendering
 	</script>
 </body>
 </html>
