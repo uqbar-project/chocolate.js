@@ -42,11 +42,11 @@ function Actor(definition) {
 	this.value = (definition.init || defaultInit)();
 	this._behaviour = definition.behaviour || {};
 
-	validateExists(definition.render, "render method");
-	validateExists(definition.bound, "bound method");
+	validateExists(definition.appearance.render, "appearance.render");
+	validateExists(definition.appearance.bound, "appearance.bound");
 
-	this._render = definition.render;
-	this._bound = definition.bound;
+	this._appearance =  definition.appearance;
+
 	this._context = new ActorContext(this);
 	this.ref = new ActorRef(this);
 }
@@ -59,9 +59,9 @@ Actor.prototype = {
 		mailbox.forEach(function(it){ it() });
 	},
 	render: function(canvas) {
-		this._render(this.value, this.bound, canvas)
+		this._appearance.render(this.value, this.bound, canvas)
 	},
 	get bound() {
-		return this._bound(this.value)
+		return this._appearance.bound(this.value)
 	}
 }

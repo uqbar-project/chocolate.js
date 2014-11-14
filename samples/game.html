@@ -49,10 +49,12 @@
 			}
 		},
 		behaviour: Moving,
-		render: function(value, bound, canvas) {
-			canvas.drawRectangle(bound, value.selected ? '#0ED600' : '#8ED6FF');
-		},
-		bound: rectangular({y:0, width: 100, height: 100})
+		appearance: {
+			render: function(value, bound, canvas) {
+				canvas.drawRectangle(bound, value.selected ? '#0ED600' : '#8ED6FF');
+			},
+			bound: rectangular({y:0, width: 100, height: 100})
+		}
 	};
 
 	var LittleSquare = {
@@ -65,10 +67,12 @@
 				context.destroy();
 			}
 		},
-		render: function(value, bound, canvas) {
-			canvas.drawRectangle(bound);
-		},
-		bound: rectangular({y:50, width: 10, height: 10})
+		appearance: {
+			render: function(value, bound, canvas) {
+				canvas.drawRectangle(bound);
+			},
+			bound: rectangular({y:50, width: 10, height: 10})
+		}
 	}
 
 	var Wall = {
@@ -86,10 +90,12 @@
 				value.touching = false;
 			}
 		},
-		render: function(value, bound, canvas) {
-			canvas.drawRectangle(bound, value.touching ? '#FF2020' : null);
-		},
-		bound: rectangular(new Rectangle(400, 0, 10, 180))
+		appearance: {
+			render: function(value, bound, canvas) {
+				canvas.drawRectangle(bound, value.touching ? '#FF2020' : null);
+			},
+			bound: rectangular(new Rectangle(400, 0, 10, 180))
+		}
 	};
 
 	var canvas1 = new Canvas('canvas');

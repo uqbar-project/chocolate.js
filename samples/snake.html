@@ -65,13 +65,15 @@
 				value.rings.unshift(newHead(value))
 			}
 		},
-		render: function(value, bound, canvas) {
-			bound.parts.forEach(function(p){
-				canvas.drawRectangle(p)
-			})
-		},
-		bound: function(value) {
-			return new Composite(value.rings.map(Cell))
+		appearance: {
+			render: function(value, bound, canvas) {
+				bound.parts.forEach(function(p){
+					canvas.drawRectangle(p)
+				})
+			},
+			bound: function(value) {
+				return new Composite(value.rings.map(Cell))
+			}
 		}
 	}
 
@@ -88,10 +90,12 @@
 				value.y = roundTo(Math.random() * 500, 10)
 			}
 		},
-		render: function(value, bound, canvas) {
-			canvas.drawRectangle(bound, '#101010');
-		},
-		bound: Cell
+		appearance: {
+			render: function(value, bound, canvas) {
+				canvas.drawRectangle(bound, '#101010');
+			},
+			bound: Cell
+		}
 	}
 
 	var canvas1 = new Canvas('canvas');
